@@ -111,9 +111,7 @@ public abstract class MemoryConsumer {
   /**
    * Allocate a memory block with at least `required` bytes.
    *
-   * Throws IOException if there is not enough memory.
-   *
-   * @throws OutOfMemoryError
+   * @throws OutOfMemoryError if there is not enough memory available.
    */
   protected MemoryBlock allocatePage(long required) {
     MemoryBlock page = taskMemoryManager.allocatePage(Math.max(pageSize, required), this);
