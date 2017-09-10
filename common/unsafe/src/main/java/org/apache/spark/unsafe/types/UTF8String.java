@@ -30,6 +30,8 @@ import com.esotericsoftware.kryo.KryoSerializable;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
+import com.google.common.primitives.UnsignedLongs;
+
 import org.apache.spark.unsafe.Platform;
 import org.apache.spark.unsafe.array.ByteArrayMethods;
 import org.apache.spark.unsafe.hash.Murmur3_x86_32;
@@ -64,7 +66,8 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
     5, 5, 5, 5,
     6, 6};
 
-  private static boolean isLittleEndian = ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN;
+  private static final boolean IS_LITTLE_ENDIAN =
+      ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN;
 
   private static final UTF8String COMMA_UTF8 = UTF8String.fromString(",");
   public static final UTF8String EMPTY_UTF8 = UTF8String.fromString("");
@@ -220,7 +223,7 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
     // After getting the data, we use a mask to mask out data that is not part of the string.
     long p;
     long mask = 0;
-    if (isLittleEndian) {
+    if (IS_LITTLE_ENDIAN) {
       if (numBytes >= 8) {
         p = Platform.getLong(base, offset);
       } else if (numBytes > 4) {
@@ -1097,8 +1100,21 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
   @Override
   public int compareTo(@Nonnull final UTF8String other) {
     int len = Math.min(numBytes, other.numBytes);
-    // TODO: compare 8 bytes as unsigned long
-    for (int i = 0; i < len; i ++) {
+    int wordMax = (len / 8) * 8;
+    long roffset = other.getBaseOffset();
+    Object rbase = other.getBaseObject();
+    for (int i = 0; i < wordMax; i += 8) {
+      long left = getLong(base, offset + i);
+      long right = getLong(rbase, roffset + i);
+      if (left != right) {
+        if (IS_LITTLE_ENDIAN) {
+          return UnsignedLongs.compare(Long.reverseBytes(left), Long.reverseBytes(right));
+        } else {
+          return UnsignedLongs.compare(left, right);
+        }
+      }
+    }
+    for (int i = wordMax; i < len; i++) {
       // In UTF-8, the byte should be unsigned, so we should compare them as unsigned int.
       int res = (getByte(i) & 0xFF) - (other.getByte(i) & 0xFF);
       if (res != 0) {
