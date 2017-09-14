@@ -39,7 +39,7 @@ object UTF8StringBenchmark {
       }
       sb.toString
     }
-    val count = 4 * 1000
+    val count = 16 * 1000
 
     val dataTiny = Seq.fill(count)(randomString(2, 7))
       .map(UTF8String.fromString).toArray
@@ -65,7 +65,7 @@ object UTF8StringBenchmark {
       }
     }
 
-    val benchmark = new Benchmark("String compareTo", count * iters, 100)
+    val benchmark = new Benchmark("String compareTo", count * iters, 25)
     benchmark.addCase("2-7 byte")(strings(dataTiny))
     benchmark.addCase("8-16 byte")(strings(dataSmall))
     benchmark.addCase("16-32 byte")(strings(dataMedium))

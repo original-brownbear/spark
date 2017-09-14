@@ -1112,28 +1112,27 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
       long right = getLong(rbase, roffset + i);
       long diff = left ^ right;
       if (diff != 0) {
-        if (IS_LITTLE_ENDIAN) {
-          int n = 0;
-          int y;
-          int x = (int) diff;
-          if (x == 0) {
-            x = (int) (diff >>> 32);
-            n = 32;
-          }
-          y = x << 16;
-          if (y == 0) {
-            n += 16;
-          } else {
-            x = y;
-          }
-          y = x << 8;
-          if (y == 0) {
-            n += 8;
-          }
-          return (int) (((left >>> n) & 0xFFL) - ((right >>> n) & 0xFFL));
-        } else {
+        if (!IS_LITTLE_ENDIAN) {
           return UnsignedLongs.compare(Long.reverseBytes(left), Long.reverseBytes(right));
         }
+        int n = 0;
+        int y;
+        int x = (int) diff;
+        if (x == 0) {
+          x = (int) (diff >>> 32);
+          n = 32;
+        }
+        y = x << 16;
+        if (y == 0) {
+          n += 16;
+        } else {
+          x = y;
+        }
+        y = x << 8;
+        if (y == 0) {
+          n += 8;
+        }
+        return (int) (((left >>> n) & 0xFFL) - ((right >>> n) & 0xFFL));
       }
     }
     for (int i = wordMax; i < len; i++) {
