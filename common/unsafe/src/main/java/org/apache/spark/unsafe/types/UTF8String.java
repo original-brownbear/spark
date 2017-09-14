@@ -1104,22 +1104,12 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
   @Override
   public int compareTo(@Nonnull final UTF8String other) {
     int len = Math.min(numBytes, other.numBytes);
-    if (len > 7) {
-      return compareLarge(
-          this.base, this.offset, numBytes, other.base, other.offset, other.numBytes, len);
-    } else {
-      return compareSmall(
-          this.base, this.offset, numBytes, other.base, other.offset, other.numBytes, len
-      );
-    }
-  }
-
-  private static int compareLarge(Object base1, long off1, int len1, Object base2, long off2,
-      int len2, int len) {
     int wordMax = len & ~7;
+    long roffset = other.offset;
+    Object rbase = other.base;
     for (int i = 0; i < wordMax; i += 8) {
-      long left = getLong(base1, off1 + i);
-      long right = getLong(base2, off2 + i);
+      long left = getLong(base, offset + i);
+      long right = getLong(rbase, roffset + i);
       if (left != right) {
         if (IS_LITTLE_ENDIAN) {
           return UnsignedLongs.compare(Long.reverseBytes(left), Long.reverseBytes(right));
@@ -1130,26 +1120,12 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
     }
     for (int i = wordMax; i < len; i++) {
       // In UTF-8, the byte should be unsigned, so we should compare them as unsigned int.
-      int res = (Platform.getByte(base1, off1 + i) & 0xFF) -
-          (Platform.getByte(base2, off2 + i) & 0xFF);
+      int res = (getByte(i) & 0xFF) - (Platform.getByte(rbase, roffset + i) & 0xFF);
       if (res != 0) {
         return res;
       }
     }
-    return compareSmall(base1, off1 + wordMax, len1, base2, off2 + wordMax, len2, len - wordMax);
-  }
-
-  private static int compareSmall(Object base1, long off1, int len1, Object base2, long off2,
-      int len2, int len) {
-    for (int i = 0; i < len; i++) {
-      // In UTF-8, the byte should be unsigned, so we should compare them as unsigned int.
-      int res = (Platform.getByte(base1, off1 + i) & 0xFF) -
-          (Platform.getByte(base2, off2 + i) & 0xFF);
-      if (res != 0) {
-        return res;
-      }
-    }
-    return len1 - len2;
+    return numBytes - other.numBytes;
   }
 
   public int compare(final UTF8String other) {
