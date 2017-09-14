@@ -1104,38 +1104,8 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
   @Override
   public int compareTo(@Nonnull final UTF8String other) {
     int len = Math.min(numBytes, other.numBytes);
-    int wordMax = (len / 8) * 8;
-    long roffset = other.offset;
-    Object rbase = other.base;
-    for (int i = 0; i < wordMax; i += 8) {
-      long left = getLong(base, offset + i);
-      long right = getLong(rbase, roffset + i);
-      long diff = left ^ right;
-      if (diff != 0L) {
-        if (!IS_LITTLE_ENDIAN) {
-          return UnsignedLongs.compare(Long.reverseBytes(left), Long.reverseBytes(right));
-        }
-        int n = 0;
-        int y;
-        int x = (int) diff;
-        if (x == 0) {
-          x = (int) (diff >>> 32);
-          n = 32;
-        }
-        y = x << 16;
-        if (y == 0) {
-          n += 16;
-        } else {
-          x = y;
-        }
-        y = x << 8;
-        if (y == 0) {
-          n += 8;
-        }
-        return (int) (((left >>> n) & 0xFFL) - ((right >>> n) & 0xFFL));
-      }
-    }
-    for (int i = wordMax; i < len; i++) {
+    // TODO: compare 8 bytes as unsigned long
+    for (int i = 0; i < len; i ++) {
       // In UTF-8, the byte should be unsigned, so we should compare them as unsigned int.
       int res = (getByte(i) & 0xFF) - (other.getByte(i) & 0xFF);
       if (res != 0) {
