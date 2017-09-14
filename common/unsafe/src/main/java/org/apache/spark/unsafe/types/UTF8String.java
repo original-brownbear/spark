@@ -1138,7 +1138,7 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
     return compareSmall(base1, off1 + wordMax, len1, base2, off2 + wordMax, len2, len - wordMax);
   }
 
-  private static int compareSmall(Object base1, long off1, int length1, Object base2, long off2,
+  private static int compareSmall(Object base1, long off1, int len1, Object base2, long off2,
       int len2, int len) {
     for (int i = 0; i < len; i++) {
       // In UTF-8, the byte should be unsigned, so we should compare them as unsigned int.
@@ -1148,7 +1148,7 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
         return res;
       }
     }
-    return length1 - len2;
+    return len1 - len2;
   }
 
   public int compare(final UTF8String other) {
