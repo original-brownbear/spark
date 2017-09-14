@@ -16,11 +16,10 @@
  */
 package org.apache.spark.benchmarks
 
-import org.apache.spark.unsafe.types.UTF8String
-import org.apache.spark.util.Benchmark
-
 import scala.util.Random
 
+import org.apache.spark.unsafe.types.UTF8String
+import org.apache.spark.util.Benchmark
 
 object UTF8StringBenchmark {
 
