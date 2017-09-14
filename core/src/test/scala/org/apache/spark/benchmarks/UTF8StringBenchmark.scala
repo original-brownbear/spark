@@ -49,9 +49,9 @@ object UTF8StringBenchmark {
     val dataMedium = Seq.fill(count)(randomString(16, 32))
       .map(UTF8String.fromString).toArray
 
-    val dataLarge = Seq.fill(count)(randomString(56, 128))
+    val dataLarge = Seq.fill(count)(randomString(512, 1024))
       .map(UTF8String.fromString).toArray
-    
+
     def strings(data: Array[UTF8String]) = { _: Int =>
       var sum = 0L
       for (_ <- 0L until iters) {
@@ -64,11 +64,11 @@ object UTF8StringBenchmark {
       }
     }
 
-    val benchmark = new Benchmark("String compareTo", count * iters)
-    benchmark.addCase("2-7 byte")(strings(dataTiny))
-    benchmark.addCase("8-16 byte")(strings(dataSmall))
-    benchmark.addCase("16-32 byte")(strings(dataMedium))
-    benchmark.addCase("56-128 byte")(strings(dataLarge))
+    val benchmark = new Benchmark("String compareTo", count * iters, 100)
+    //benchmark.addCase("2-7 byte")(strings(dataTiny))
+    //benchmark.addCase("8-16 byte")(strings(dataSmall))
+    //benchmark.addCase("16-32 byte")(strings(dataMedium))
+    benchmark.addCase("512-1024 byte")(strings(dataLarge))
     benchmark.run
   }
 

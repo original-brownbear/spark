@@ -1101,8 +1101,8 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
   public int compareTo(@Nonnull final UTF8String other) {
     int len = Math.min(numBytes, other.numBytes);
     int wordMax = (len / 8) * 8;
-    long roffset = other.getBaseOffset();
-    Object rbase = other.getBaseObject();
+    long roffset = other.offset;
+    Object rbase = other.base;
     for (int i = 0; i < wordMax; i += 8) {
       long left = getLong(base, offset + i);
       long right = getLong(rbase, roffset + i);
