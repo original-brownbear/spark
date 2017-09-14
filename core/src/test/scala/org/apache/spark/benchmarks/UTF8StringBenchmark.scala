@@ -16,11 +16,10 @@
  */
 package org.apache.spark.benchmarks
 
-import java.nio.charset.StandardCharsets
-
-import scala.util.Random
 import org.apache.spark.unsafe.types.UTF8String
 import org.apache.spark.util.Benchmark
+
+import scala.util.Random
 
 
 object UTF8StringBenchmark {
@@ -39,6 +38,7 @@ object UTF8StringBenchmark {
       }
       sb.toString
     }
+
     val count = 16 * 1000
 
     val dataTiny = Seq.fill(count)(randomString(2, 7))

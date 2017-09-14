@@ -1111,7 +1111,7 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
       long left = getLong(base, offset + i);
       long right = getLong(rbase, roffset + i);
       long diff = left ^ right;
-      if (diff != 0) {
+      if (diff != 0L) {
         if (!IS_LITTLE_ENDIAN) {
           return UnsignedLongs.compare(Long.reverseBytes(left), Long.reverseBytes(right));
         }
