@@ -69,6 +69,7 @@ object UTF8StringBenchmark {
     benchmark.addCase("8-16 byte")(strings(dataSmall))
     benchmark.addCase("16-32 byte")(strings(dataMedium))
     benchmark.addCase("512-1024 byte")(strings(dataLarge))
+    benchmark.addCase("2-7 byte")(strings(dataTiny))
     benchmark.run
   }
 

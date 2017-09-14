@@ -1109,7 +1109,8 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
           this.base, this.offset, numBytes, other.base, other.offset, other.numBytes, len);
     } else {
       return compareSmall(
-          this.base, this.offset, numBytes, other.base, other.offset, other.numBytes, len);
+          this.base, this.offset, numBytes, other.base, other.offset, other.numBytes, len
+      );
     }
   }
 
