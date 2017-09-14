@@ -41,16 +41,16 @@ object UTF8StringBenchmark {
     val count = 16 * 1000
 
     val dataTiny = Seq.fill(count)(randomString(2, 7))
-      .map(UTF8String.fromString).toArray
+      .map(UTF8String.fromString).sorted.toArray
 
     val dataSmall = Seq.fill(count)(randomString(8, 16))
-      .map(UTF8String.fromString).toArray
+      .map(UTF8String.fromString).sorted.toArray
 
     val dataMedium = Seq.fill(count)(randomString(16, 32))
-      .map(UTF8String.fromString).toArray
+      .map(UTF8String.fromString).sorted.toArray
 
     val dataLarge = Seq.fill(count)(randomString(512, 1024))
-      .map(UTF8String.fromString).toArray
+      .map(UTF8String.fromString).sorted.toArray
 
     def strings(data: Array[UTF8String]) = { _: Int =>
       var sum = 0L
