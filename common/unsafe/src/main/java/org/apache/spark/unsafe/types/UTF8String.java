@@ -17,26 +17,30 @@
 
 package org.apache.spark.unsafe.types;
 
-import javax.annotation.Nonnull;
-import java.io.*;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoSerializable;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import com.google.common.primitives.UnsignedLongs;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
-
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.KryoSerializable;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-
-import com.google.common.primitives.UnsignedLongs;
-
+import javax.annotation.Nonnull;
 import org.apache.spark.unsafe.Platform;
 import org.apache.spark.unsafe.array.ByteArrayMethods;
 import org.apache.spark.unsafe.hash.Murmur3_x86_32;
 
-import static org.apache.spark.unsafe.Platform.*;
+import static org.apache.spark.unsafe.Platform.BYTE_ARRAY_OFFSET;
+import static org.apache.spark.unsafe.Platform.copyMemory;
+import static org.apache.spark.unsafe.Platform.getLong;
 
 
 /**
@@ -1106,11 +1110,29 @@ public final class UTF8String implements Comparable<UTF8String>, Externalizable,
     for (int i = 0; i < wordMax; i += 8) {
       long left = getLong(base, offset + i);
       long right = getLong(rbase, roffset + i);
-      if (left != right) {
+      long diff = left ^ right;
+      if (diff != 0) {
         if (IS_LITTLE_ENDIAN) {
-          return UnsignedLongs.compare(Long.reverseBytes(left), Long.reverseBytes(right));
+          int n = 0;
+          int y;
+          int x = (int) diff;
+          if (x == 0) {
+            x = (int) (diff >>> 32);
+            n = 32;
+          }
+          y = x << 16;
+          if (y == 0) {
+            n += 16;
+          } else {
+            x = y;
+          }
+          y = x << 8;
+          if (y == 0) {
+            n += 8;
+          }
+          return (int) (((left >>> n) & 0xFFL) - ((right >>> n) & 0xFFL));
         } else {
-          return UnsignedLongs.compare(left, right);
+          return UnsignedLongs.compare(Long.reverseBytes(left), Long.reverseBytes(right));
         }
       }
     }

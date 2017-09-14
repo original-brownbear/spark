@@ -16,8 +16,9 @@
  */
 package org.apache.spark.benchmarks
 
-import scala.util.Random
+import java.nio.charset.StandardCharsets
 
+import scala.util.Random
 import org.apache.spark.unsafe.types.UTF8String
 import org.apache.spark.util.Benchmark
 
@@ -33,10 +34,10 @@ object UTF8StringBenchmark {
       val sb = new StringBuilder(len)
       var i = 0
       while (i < len) {
-        sb.append(chars.charAt(random.nextInt(chars.length())));
+        sb.append(chars.charAt(random.nextInt(chars.length())))
         i += 1
       }
-      return sb.toString
+      sb.toString
     }
     val count = 4 * 1000
 
@@ -65,9 +66,9 @@ object UTF8StringBenchmark {
     }
 
     val benchmark = new Benchmark("String compareTo", count * iters, 100)
-    //benchmark.addCase("2-7 byte")(strings(dataTiny))
-    //benchmark.addCase("8-16 byte")(strings(dataSmall))
-    //benchmark.addCase("16-32 byte")(strings(dataMedium))
+    benchmark.addCase("2-7 byte")(strings(dataTiny))
+    benchmark.addCase("8-16 byte")(strings(dataSmall))
+    benchmark.addCase("16-32 byte")(strings(dataMedium))
     benchmark.addCase("512-1024 byte")(strings(dataLarge))
     benchmark.run
   }
